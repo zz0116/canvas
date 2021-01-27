@@ -5,51 +5,32 @@ const width1 = canvas1.width;
 const height1 = canvas1.height;
 
 ctx1.globalCompositeOperation = "lighter";
-ctx1.fillStyle = "rgba(0, 0, 0, 0.1)";
+ctx1.fillStyle = fillStyle;
 ctx1.lineWidth = 0.1;
 
 function draw1() {
-    let timeS = new Date().getTime();
     clearCanvas(ctx1);
-
-    // let p1 = {
-    //         x: 10,
-    //         y: 10
-    //     },
-    //     p2 = {
-    //         x: 30,
-    //         y: 10
-    //     },
-    //     p3 = {
-    //         x: 10,
-    //         y: 50
-    //     },
-    //     p4 = {
-    //         x: 30,
-    //         y: 60
-    //     };
-
-    // polygon1(p1, p2, p3, p4);
-
+    
+    let polygonList = [];
     Object.keys(data).forEach(rollerId => {
-        let polygonList = [];
         let curData = data[rollerId];
-        if (dataEnd > curData.length - 3) {
-            dataEnd = curData.length - 3;
+        var curDataEnd = dataEnd;
+        if (curDataEnd > curData.length - 3) {
+            curDataEnd = curData.length - 3;
         }
         let p2Arr = [curData[0]];
         let p3Arr = [curData[1]];
-        for (let i = dataBegin; i < dataEnd; i += 2) {
+        for (let i = dataBegin; i < curDataEnd; i += 2) {
             let p1 = curData[i];
             let p4 = curData[i + 1];
             let p2 = curData[i + 2];
             let p3 = curData[i + 3];
 
-            // if ((p4.x == p3.x && p4.y == p3.y) || (p1.x == p2.x && p1.y == p2.y)) {
-            //     continue;
-            // }
+            if (dis(p1, p2) < 0.01) {
+                continue;
+            }
 
-            if (dis(p1, p2) > 10) {
+            if (dis(p1, p2) > 5) {
                 collectPolygon(polygonList, p2Arr, p3Arr);
                 p2Arr = [p2];
                 p3Arr = [p3];
@@ -70,12 +51,8 @@ function draw1() {
                 p3Arr = [p1];
             }
         }
-        drawTrack(polygonList);
     });
-
-    let timeE = new Date().getTime();
-
-    // console.log('canvas1', timeE - timeS);
+    drawTrack(polygonList);
 }
 
 function collectPolygon(polygons, p2Arr, p3Arr) {
@@ -87,23 +64,15 @@ function collectPolygon(polygons, p2Arr, p3Arr) {
     }
 }
 
-function polygon1(p1, p2, p3, p4) {
-    ctx1.beginPath();
-    ctx1.moveTo(p1.x, p1.y);
-    ctx1.lineTo(p2.x, p2.y);
-    ctx1.lineTo(p3.x, p3.y);
-    ctx1.lineTo(p4.x, p4.y);
-    ctx1.closePath();
-    ctx1.fill();
-    ctx1.stroke();
-}
-
 function drawTrack(polygons) {
     if (polygons.length == 0) {
         return;
     }
     for (let i = 0; i < polygons.length; i++) {
         const polygon = polygons[i];
+        if (polygon.length < 4) {
+            continue;
+        }
 
         ctx1.beginPath();
         ctx1.moveTo(polygon[0].x, polygon[0].y);
@@ -111,28 +80,8 @@ function drawTrack(polygons) {
             const p = polygon[j];
             ctx1.lineTo(p.x, p.y);
         }
-        ctx1.closePath();
-        ctx1.stroke();
+        // ctx1.closePath();
+        // ctx1.stroke();
         ctx1.fill();
     }
-}
-
-function polygonBig(arr1, arr2) {
-    if (arr1.length < 2 || arr2.length < 2) {
-        return;
-    }
-
-    ctx1.beginPath();
-    ctx1.moveTo(arr1[0].x, arr1[0].y);
-    for (let i = 0; i < arr1.length; i++) {
-        let p = arr1[i];
-        ctx1.lineTo(p.x, p.y);
-    }
-    for (let i = arr2.length - 1; i > 0; i--) {
-        let p = arr2[i];
-        ctx1.lineTo(p.x, p.y);
-    }
-    ctx1.closePath();
-    ctx1.fill();
-    ctx1.stroke();
 }

@@ -2,8 +2,13 @@
 animate();
 
 function animate() {
+    let t1 = new Date().getTime();
     draw();
+    let t2 = new Date().getTime();
     draw1();
+    let t3 = new Date().getTime();
+    console.log('canvas', t2 - t1);
+    console.log('canvas1', t3 - t2);
     dataEnd++;
     window.requestAnimationFrame(animate);
 }
