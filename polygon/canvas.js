@@ -6,7 +6,7 @@ const height = canvas.height;
 
 ctx.globalCompositeOperation = "lighter";
 ctx.fillStyle = fillStyle;
-ctx.lineWidth = 0.1;
+ctx.lineWidth = lineWidth;
 
 function draw() {
     clearCanvas(ctx);
@@ -45,5 +45,5 @@ function polygon(p1, p2, p3, p4) {
     ctx.lineTo(p4.x, p4.y);
     ctx.closePath();
     ctx.fill();
-    // ctx.stroke();
+    ctx.stroke();
 }

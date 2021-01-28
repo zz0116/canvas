@@ -40,6 +40,10 @@ function draw1() {
             if (sameDirection(p1, p2, p3, p4)) {
                 p2Arr.push(p2);
                 p3Arr.push(p3);
+
+                if (i + 2 >= dataEnd) {
+                    collectPolygon(polygonList, p2Arr, p3Arr);
+                }
             } else {
                 collectPolygon(polygonList, p2Arr, p3Arr);
 
@@ -47,7 +51,6 @@ function draw1() {
                 p3Arr = [p1];
             }
         }
-        collectPolygon(polygonList, p2Arr, p3Arr);
     });
     drawTrack(polygonList);
 }
@@ -78,7 +81,7 @@ function drawTrack(polygons) {
             ctx1.lineTo(p.x, p.y);
         }
         // ctx1.closePath();
-        ctx1.stroke();
+        // ctx1.stroke();
         ctx1.fill();
     }
 }

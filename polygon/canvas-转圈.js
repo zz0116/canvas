@@ -10,7 +10,7 @@ ctx1.lineWidth = lineWidth;
 
 function draw1() {
     clearCanvas(ctx1);
-    
+
     let polygonList = [];
     Object.keys(data).forEach(rollerId => {
         let curData = data[rollerId];
@@ -36,18 +36,27 @@ function draw1() {
                 p3Arr = [p3];
                 continue;
             }
+            if (isSegmentsIntersectant([p1, p2], [p3, p4])) {
+                collectPolygon(polygonList, p2Arr, p3Arr);
+                p2Arr = [p2];
+                p3Arr = [p3];
+                continue;
+            }
 
-            if (sameDirection(p1, p2, p3, p4)) {
-                p2Arr.push(p2);
-                p3Arr.push(p3);
-            } else {
+            if (isIntersect(p2Arr, p3Arr, p1, p2, p3, p4)) {
                 collectPolygon(polygonList, p2Arr, p3Arr);
 
-                p2Arr = [p4];
-                p3Arr = [p1];
+                p2Arr = [p2];
+                p3Arr = [p3];
+            } else {
+                p2Arr.push(p2);
+                p3Arr.push(p3);
+
+                if (i + 2 >= dataEnd) {
+                    collectPolygon(polygonList, p2Arr, p3Arr);
+                }
             }
         }
-        collectPolygon(polygonList, p2Arr, p3Arr);
     });
     drawTrack(polygonList);
 }
@@ -81,4 +90,43 @@ function drawTrack(polygons) {
         ctx1.stroke();
         ctx1.fill();
     }
+}
+
+function isIntersect(p2Arr, p3Arr, p1, p2, p3, p4) {
+    var polygon1 = [];
+    for (let j = 0; j < p2Arr.length; j++) {
+        polygon1.push(p2Arr[j]);
+        
+    }
+    for (let j = p3Arr.length - 1; j >= 0; j--) {
+        polygon1.push(p3Arr[j]);
+    }
+    var polygon2 = [p1, p2, p3, p4];
+    return isPolygonsIntersectant(polygon1, polygon2);
+}
+
+//判断两多边形线段是否相交
+function isSegmentsIntersectant(segA, segB) {
+    const abc = (segA[0].x - segB[0].x) * (segA[1].y - segB[0].y) - (segA[0].y - segB[0].y) * (segA[1].x - segB[0].x);
+    const abd = (segA[0].x - segB[1].x) * (segA[1].y - segB[1].y) - (segA[0].y - segB[1].y) * (segA[1].x - segB[1].x);
+    if (abc * abd >= 0) {
+        return false;
+    }
+    const cda = (segB[0].x - segA[0].x) * (segB[1].y - segA[0].y) - (segB[0].y - segA[0].y) * (segB[1].x - segA[0].x);
+    const cdb = cda + abc - abd;
+    return !(cda * cdb >= 0);
+}
+
+//判断两多边形边界是否相交
+function isPolygonsIntersectant(plyA, plyB) {
+    for (let i = 0, il = plyA.length; i < il; i++) {
+        for (let j = 0, jl = plyB.length; j < jl; j++) {
+            const segA = [plyA[i], plyA[i === il - 1 ? 0 : i + 1]];
+            const segB = [plyB[j], plyB[j === jl - 1 ? 0 : j + 1]];
+            if (isSegmentsIntersectant(segA, segB)) {
+                return true;
+            }
+        }
+    }
+    return false;
 }
